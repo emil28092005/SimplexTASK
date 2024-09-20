@@ -77,10 +77,7 @@ std::ostream& operator<<(std::ostream& cout, ColumnVector& vectorObj) {
 Matrix::Matrix(int n, int m) {
 	rows = n;
 	columns = m;
-	matrix.resize(n);
-	for (auto& row : matrix) {
-		row = ColumnVector(m);
-	}
+	matrix.resize(n, ColumnVector(m));
 }
 
 Matrix::Matrix(const Matrix& other) {
