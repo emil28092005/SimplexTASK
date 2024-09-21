@@ -1,24 +1,21 @@
 #include <iostream>
 #include "tools/matrix.h"
 #include "tools/math.h"
+#include "simplex.h"
 
 int main() {
-    int n, m;
-    std::cin >> n;
-    std::cin >> m;
+    ColumnVector C(6);
+    Matrix A(6, 4);
+    int Carr[C.getColumns()] = {-5, -4, 0, 0, 0, 0};
+    for (int i = 0; i < C.getRows(); ++i) {
+        C[i] = Carr[i];
+    }
+    A = {{6, 4, 1, 0, 0, 0}, {1, 2, 0, 1, 0, 0}, {-1, 1, 0, 0, 1, 0}, {0, 1, 0, 0, 0, 1}};
+    ColumnVector b(A.getRows());
+    b = {24, 6, 1, 2};
+    std::cout << A << std::endl;
+    std::cout << C << std::endl;
 
-    ColumnVector C(n);
-    Matrix A(n, m);
-    ColumnVector b(n);
-    double eps;
-    double eps_default;
-    std::cin >> A;
-
-    std::cout << "Вектор C: " << C << std::endl;
-
-    std::cout << "Матрица A: " << A << std::endl;
-
-    Matrix B(2, 2);
-    std::cout << B << std::endl;
+    Simplex(C, A, b, 0.01, true);
     return 0;
 }
