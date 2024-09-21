@@ -4,6 +4,7 @@
 #include <vector>
 
 class ColumnVector;
+class Matrix;
 
 class Math {
 public:
