@@ -36,8 +36,12 @@ Result Simplex(Vector C, Matrix A, Vector b, double eps = 0.01, bool maximize=tr
 		int pivot_row_index = min_index(ratio_vector);
 
 		//5
-		// FracturedMatrix fractured_matrix;
-		// fractured_matrix = elimination(A, C, b, pivot_column_index, pivot_row_index);
+		FracturedMatrix fractured_matrix(elimination(A, C, b, pivot_column_index, pivot_row_index));
+		A = fractured_matrix.A;
+		C = fractured_matrix.C;
+		b = fractured_matrix.b;
+		pivot_column_index = fractured_matrix.pivot_column_index;
+		pivot_row_index = fractured_matrix.pivot_row_index;
 	}
 
 	Result result;
