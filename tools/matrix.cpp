@@ -1,68 +1,76 @@
 #include "matrix.h"
 
-ColumnVector::ColumnVector(int n) {
+Vector::Vector(int n) {
   rows = n;
   columns = 1;
-  columnVector.resize(n);
+  vector.resize(n);
 }
 
-ColumnVector::ColumnVector(const ColumnVector& other) {
+Vector::Vector(const Vector& other) {
   rows = other.rows;
   columns = other.columns;
-  columnVector = other.columnVector;
+  vector = other.vector;
 }
 
-int ColumnVector::getRows() const {
+Vector::Vector(std::initializer_list<double> init) {
+  rows = init.size();
+  columns = 1;
+  vector = std::vector<double>(rows);
+
+  auto it = init.begin();
+  
+  for (size_t i = 0; i < init.size(); ++i) {
+    vector[i] = *it++;
+  }
+}
+
+int Vector::size() const {
   return rows;
 }
 
-int ColumnVector::getColumns() const {
-  return columns;
+double& Vector::operator[](int row) {
+  return vector[row];
 }
 
-double& ColumnVector::operator[](int row) {
-  return columnVector[row];
-}
-
-ColumnVector& ColumnVector::operator=(const ColumnVector& other) {
+Vector& Vector::operator=(const Vector& other) {
   rows = other.rows;
   columns = other.columns;
-  columnVector = other.columnVector;
+  vector = other.vector;
   return *this;
 }
 
-ColumnVector ColumnVector::operator+(ColumnVector& other) {
+Vector Vector::operator+(Vector& other) {
   if (rows != other.rows) {
     throw std::runtime_error("Error: the dimensional problem occurred");
   }
-  ColumnVector result(rows);
+  Vector result(rows);
   for (int i = 0; i < rows; ++i) {
-    result[i] = columnVector[i] + other[i];
+    result[i] = vector[i] + other[i];
   }
 
   return result;
 }
 
-ColumnVector ColumnVector::operator-(ColumnVector& other) {
+Vector Vector::operator-(Vector& other) {
   if (rows != other.rows) {
     throw std::runtime_error("Error: the dimensional problem occurred");
   }
-  ColumnVector result(rows);
+  Vector result(rows);
   for (int i = 0; i < rows; ++i) {
-    result[i] = columnVector[i] - other[i];
+    result[i] = vector[i] - other[i];
   }
 
   return result;
 }
 
-std::istream& operator>>(std::istream& cin, ColumnVector& vectorObj) {
+std::istream& operator>>(std::istream& cin, Vector& vectorObj) {
   for (int i = 0; i < vectorObj.rows; ++i) {
     cin >> vectorObj[i];
   }
   return cin;
 }
 
-std::ostream& operator<<(std::ostream& cout, ColumnVector& vectorObj) {
+std::ostream& operator<<(std::ostream& cout, Vector& vectorObj) {
   for (int i = 0; i < vectorObj.rows; ++i) {
     if (i == vectorObj.rows - 1) {
       cout << vectorObj[i] << std::endl;
@@ -77,9 +85,9 @@ std::ostream& operator<<(std::ostream& cout, ColumnVector& vectorObj) {
 Matrix::Matrix(int n, int m) {
   rows = n;
   columns = m;
-  matrix.resize(n, ColumnVector(m));
+  matrix.resize(n, Vector(m));
   for (auto& row : matrix) {
-    row = ColumnVector(m);
+    row = Vector(m);
   }
 }
 
@@ -87,6 +95,20 @@ Matrix::Matrix(const Matrix& other) {
   rows = other.rows;
   columns = other.columns;
   matrix = other.matrix;
+}
+
+Matrix::Matrix(std::initializer_list<std::vector<double>> init) {
+  rows = init.size();
+  auto it = init.begin();
+  columns = it->size();
+  matrix = std::vector<Vector>(rows, Vector(columns));
+
+  for (int i = 0; i < rows; ++i) {
+    for (int j = 0; j < columns; ++j) {
+      matrix[i][j] = it->operator[](j);
+    }
+    ++it;
+  }
 }
 
 int Matrix::getRows() const {
@@ -97,7 +119,7 @@ int Matrix::getColumns() const {
   return columns;
 }
 
-ColumnVector& Matrix::operator[](int row) {
+Vector& Matrix::operator[](int row) {
   return matrix[row];
 }
 
@@ -160,12 +182,12 @@ Matrix Matrix::operator*(Matrix& other) const {
   return result;
 }
 
-ColumnVector Matrix::operator*(ColumnVector other) const {
-  if (columns != other.getRows()) {
+Vector Matrix::operator*(Vector other) const {
+  if (columns != other.size()) {
     throw std::runtime_error("Error: the dimensional problem occurred");
   }
 
-  ColumnVector result(rows);
+  Vector result(rows);
   for (int i = 0; i < rows; ++i) {
     result[i] = 0;
     for (int k = 0; k < columns; ++k) {

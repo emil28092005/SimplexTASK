@@ -1,45 +1,44 @@
 #include "math.h"
-#include "matrix.h"
 
-double min(ColumnVector columnVector) {
-    double temp = columnVector[0];
-    for (int j = 0; j < columnVector.getColumns(); j++) {
-        if (columnVector[j] < temp) {
-            temp = columnVector[j];
+double min(Vector vector) {
+    double temp = vector[0];
+    for (int j = 0; j < vector.size(); j++) {
+        if (vector[j] < temp) {
+            temp = vector[j];
         }
     }
     return temp;
 }
 
-double max(ColumnVector columnVector) {
-    double temp = columnVector[0];
-    for (int j = 0; j < columnVector.getColumns(); j++) {
-        if (columnVector[j] > temp) {
-            temp = columnVector[j];
+double max(Vector vector) {
+    double temp = vector[0];
+    for (int j = 0; j < vector.size(); j++) {
+        if (vector[j] > temp) {
+            temp = vector[j];
         }
     }
     return temp;
 }
 
-int min_index(ColumnVector columnVector) {
+int min_index(Vector vector) {
     int temp_index = 0;
-    double temp = columnVector[0];
-    for (int j = 0; j < columnVector.getColumns(); j++) {
-        if (columnVector[j] < temp) {
+    double temp = vector[0];
+    for (int j = 0; j < vector.size(); j++) {
+        if (vector[j] < temp) {
             temp_index = j;
-            temp = columnVector[j];
+            temp = vector[j];
         }
     }
     return temp_index;
 }
 
-int max_index(ColumnVector columnVector) {
+int max_index(Vector vector) {
     int temp_index = 0;
-    double temp = columnVector[0];
-    for (int j = 0; j < columnVector.getColumns(); j++) {
-        if (columnVector[j] > temp) {
+    double temp = vector[0];
+    for (int j = 0; j < vector.size(); j++) {
+        if (vector[j] > temp) {
             temp_index = j;
-            temp = columnVector[j];
+            temp = vector[j];
         }
     }
     return temp_index;

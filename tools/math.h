@@ -2,11 +2,12 @@
 #define MATH_H
 
 #include <vector>
+#include "matrix.h"
 
-double min(ColumnVector columnVector);
-double max(ColumnVector columnVector);
-int min_index(ColumnVector columnVector);
-int max_index(ColumnVector columnVector);
+double min(Vector vector);
+double max(Vector vector);
+int min_index(Vector vector);
+int max_index(Vector vector);
 double min(std::vector<double> array);
 double max(std::vector<double> array);
 int min_index(std::vector<double> array);

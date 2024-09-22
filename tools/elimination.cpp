@@ -1,28 +1,24 @@
 #include "elimination.h"
-#include "matrix.h"
 #include "math.h"
 
-struct FracturedMatrix {
-    Matrix A;
-    ColumnVector C;
-    ColumnVector b;
-    int pivot_column_index;
-    int pivot_row_index;
-};
-
-struct DestroyMatrix {
-    Matrix A;
-    ColumnVector C;
-    ColumnVector b;
-};
+FracturedMatrix::FracturedMatrix(const FracturedMatrix& other) : A(other.A), C(other.C), b(other.b), pivot_column_index(other.pivot_column_index), pivot_row_index(other.pivot_row_index) {}
+FracturedMatrix::FracturedMatrix(Matrix A, Vector C, Vector b, int pivot_column_index, int pivot_row_index) : A(A), C(C), b(b), pivot_column_index(pivot_column_index), pivot_row_index(pivot_row_index) {}
+FracturedMatrix& FracturedMatrix::operator=(const FracturedMatrix& other) {
+    A = other.A;
+    C = other.C;
+    b = other.b;
+    pivot_column_index = other.pivot_column_index;
+    pivot_row_index = other.pivot_row_index;
+    return *this;
+}
 
 DestroyMatrix destroyGeneralMatrix(Matrix& generalMatrix) {
     int rows = generalMatrix.getRows();
     int cols = generalMatrix.getColumns();
 
     Matrix A(rows - 1, cols - 1);
-    ColumnVector C(cols - 1);
-    ColumnVector b(rows - 1);
+    Vector C(cols - 1);
+    Vector b(rows - 1);
 
     for (int j = 0; j < cols - 1; ++j) {
         C[j] = generalMatrix[0][j];
@@ -41,7 +37,7 @@ DestroyMatrix destroyGeneralMatrix(Matrix& generalMatrix) {
     return {A, C, b};
 }
 
-Matrix createGeneralMatrix(Matrix& A, ColumnVector& C, ColumnVector& b) {
+Matrix createGeneralMatrix(Matrix& A, Vector& C, Vector& b) {
     Matrix generalMatrix(A.getRows() + 1, A.getColumns() + 1);
     for (int i = 0; i < A.getColumns(); i++) {
         generalMatrix[0][i] = C[i];
@@ -60,7 +56,7 @@ Matrix createGeneralMatrix(Matrix& A, ColumnVector& C, ColumnVector& b) {
     return generalMatrix;
 }
 
-FracturedMatrix elimination(Matrix A, ColumnVector C, ColumnVector b, int pivot_column_index, int pivot_row_index) {
+FracturedMatrix elimination(Matrix A, Vector C, Vector b, int pivot_column_index, int pivot_row_index) {
     Matrix generalMatrix = createGeneralMatrix(A, C, b);
 
     int rows = generalMatrix.getRows();
@@ -87,7 +83,7 @@ FracturedMatrix elimination(Matrix A, ColumnVector C, ColumnVector b, int pivot_
 
     pivot_column_index = max_index(destroyedMatrix.C);
     
-    ColumnVector ratio_vector(A.getRows());
+    Vector ratio_vector(A.getRows());
 
     for (int i = 0; i < A.getRows(); i++) {
         if (A[i][pivot_column_index] != 0) {
@@ -99,8 +95,8 @@ FracturedMatrix elimination(Matrix A, ColumnVector C, ColumnVector b, int pivot_
         }
     }
 
-    int pivot_row_index = min_index(ratio_vector);
+    pivot_row_index = min_index(ratio_vector);
 
     return {A, C, b, pivot_column_index, pivot_row_index};
-
+}
 

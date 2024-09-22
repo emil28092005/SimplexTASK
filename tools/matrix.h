@@ -6,43 +6,42 @@
 #include <vector>
 
 /**
-* ColumnVector is a class to represent
+* Vector is a class to represent
 * a column vector with n rows.
 */
-class ColumnVector {
+class Vector {
 protected:
 	// Number of rows in vector
 	int rows;
 	// Number of columns in vector
 	int columns;
 	// Matrix representation as vector of vectors of integers
-	std::vector<double> columnVector;
+	std::vector<double> vector;
 public:
-	ColumnVector(int n);
+	Vector(int n);
 
-	ColumnVector(const ColumnVector& other);
+	Vector(const Vector& other);
+
+	Vector(std::initializer_list<double>);
 
 	/* Getter for the number of rows */
-	int getRows() const;
-
-	/* Getter for the number of columns */
-	int getColumns() const;
+	int size() const;
 
 	double& operator[](int row);
 
-	ColumnVector& operator=(const ColumnVector& other);
+	Vector& operator=(const Vector& other);
 
-	ColumnVector operator+(ColumnVector& other);
+	Vector operator+(Vector& other);
 
-	ColumnVector operator-(ColumnVector& other);
+	Vector operator-(Vector& other);
 
 	/* Input operator reads element of vector */
-	friend std::istream& operator>>(std::istream& cin, ColumnVector& vectorObj);
+	friend std::istream& operator>>(std::istream& cin, Vector& vectorObj);
 
 	/* Output operator prints elements of the vector
 	* in a row separated with a space (no space at the end of the line)
 	*/
-	friend std::ostream& operator<<(std::ostream& cout, ColumnVector& vectorObj);
+	friend std::ostream& operator<<(std::ostream& cout, Vector& vectorObj);
 };
 
 /**
@@ -57,11 +56,13 @@ protected:
 	// Number of columns in matrix
 	int columns;
 	// Matrix representation as vector of vectors of integers
-	std::vector<ColumnVector> matrix;
+	std::vector<Vector> matrix;
 public:
 	Matrix(int n, int m);
 
 	Matrix(const Matrix& other);
+
+	Matrix(std::initializer_list<std::vector<double>>);
 
 	/* Getter for the number of rows */
 	int getRows() const;
@@ -69,7 +70,7 @@ public:
 	/* Getter for the number of columns */
 	int getColumns() const;
 
-	ColumnVector& operator[](int row);
+	Vector& operator[](int row);
 
 	Matrix& operator=(const Matrix& other);
 
@@ -80,7 +81,7 @@ public:
 	Matrix operator*(Matrix& other) const;
 
 	/* Matrix-Vector multiplication */
-	ColumnVector operator*(ColumnVector other) const;
+	Vector operator*(Vector other) const;
 
 	/* Produces transposed version of the matrix */
 	Matrix transpose() const;

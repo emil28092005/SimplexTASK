@@ -2,6 +2,7 @@
 #include <iostream>
 #include "tools/matrix.h"
 #include "tools/math.h"
+#include "tools/elimination.h"
 
 enum solver_state {
 	unbounded,
@@ -10,54 +11,38 @@ enum solver_state {
 
 struct Result {
 	solver_state state;
-	ColumnVector *solution;
+	Vector *solution;
 	double objective_function_value;
 };
 
-struct FracturedMatrix {
-	Matrix A;
-	ColumnVector C;
-	ColumnVector b;
-	int pivot_column_index;
-	int pivot_row_index;
-	FracturedMatrix();
-	FracturedMatrix(const FracturedMatrix& other) : A(other.A), C(other.C), b(other.b), pivot_column_index(other.pivot_column_index), pivot_row_index(other.pivot_row_index) {}
-	FracturedMatrix(Matrix A, ColumnVector C, ColumnVector b, int pivot_column_index, int pivot_row_index) : A(A), C(C), b(b), pivot_column_index(pivot_column_index), pivot_row_index(pivot_row_index) {}
-	FracturedMatrix& FracturedMatrix::operator=(const FracturedMatrix& other) {
-		A = other.A;
-        C = other.C;
-        b = other.b;
-        pivot_column_index = other.pivot_column_index;
-        pivot_row_index = other.pivot_row_index;
-		return *this;
-	}
-};
-
-Result Simplex(ColumnVector C, Matrix A, ColumnVector b, double eps = 0.01, bool maximize=true) {
+Result Simplex(Vector C, Matrix A, Vector b, double eps = 0.01, bool maximize=true) {
 
 	std::cout << "C: " << C << std::endl;
 	std::cout << "A: " << A << std::endl;
     std::cout << "b: " << b << std::endl;
 
-    int n = C.getRows();
-    int m = A.getColumns();
+    int m = A.getRows();
 
 	while (b[0] < eps) {
 		//3
 		int pivot_column_index = 0;
-		pivot_column_index = Math::max_index(C);
+		pivot_column_index = max_index(C);
 
 		//4
-		ColumnVector ratio_vector(m);
+		Vector ratio_vector(m);
 		for (int i = 0; i < m; i++) {
 			ratio_vector[i] = b[i] / A[i][pivot_column_index];
 		}
-		int pivot_row_index = Math::min_index(ratio_vector);
+		int pivot_row_index = min_index(ratio_vector);
 
 		//5
-		struct FracturedMatrix fractured_matrix();
-		fractured_matrix = eleminate(A, C, b, pivot_column_index, pivot_row_index);
+		// FracturedMatrix fractured_matrix;
+		// fractured_matrix = elimination(A, C, b, pivot_column_index, pivot_row_index);
 	}
+
+	Result result;
+
+	return result;
 
 	/*
 	Result result;
@@ -79,7 +64,7 @@ Result Simplex(ColumnVector C, Matrix A, ColumnVector b, double eps = 0.01, bool
 
 	if (A[0][kc] >= 0) {
 		result.state = unbounded;
-		result.solution = new ColumnVector(C.getRows());
+		result.solution = new Vector(C.getRows());
 		for (int i = 0; i < C.getRows(); i++) {
 			result.solution->operator[](i) = 0;
 		}
