@@ -4,16 +4,20 @@
 #include "simplex.h"
 
 int main() {
-    Vector C(6);
-    Matrix A(6, 4);
-    int Carr[C.size()] = {-5, -4, 0, 0, 0, 0};
-    for (int i = 0; i < C.size(); ++i) {
-        C[i] = Carr[i];
+    Vector C = {5, 4, 0, 0};
+    Matrix A = {{6, 4, 1, 0, 0, 0}, {1, 2, 0, 1, 0, 0}, {-1, 1, 0, 0, 1, 0}, {0, 1, 0, 0, 0, 1}};
+    Vector b = {24, 6, 1, 2};
+
+    Result result = Simplex(C, A, b);
+    if(result.state == bounded) {
+
+        if(result.solution == nullptr) {
+            std::cout << "HUYN: Khong tim duoc nghiem" << std::endl;
+        }
+        std::cout << *result.solution << std::endl;
+        std::cout << result.objective_fucntion_value << std::endl;
+
     }
-    A = {{6, 4, 1, 0, 0, 0}, {1, 2, 0, 1, 0, 0}, {-1, 1, 0, 0, 1, 0}, {0, 1, 0, 0, 0, 1}};
-    Vector b(A.getRows());
-    b = {24, 6, 1, 2};
-    std::cout << A << std::endl;
-    std::cout << C << std::endl;
+
     return 0;
 }

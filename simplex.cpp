@@ -17,16 +17,36 @@ struct Result {
 
 Result Simplex(Vector C, Matrix A, Vector b, double eps = 0.01, bool maximize=true) {
 
-	std::cout << "C: " << C << std::endl;
-	std::cout << "A: " << A << std::endl;
-    std::cout << "b: " << b << std::endl;
-
     int m = A.getRows();
 
-	while (b[0] < eps) {
+	Result result{};
+	std::vector<int> basicVars(A.getColumns() - A.getRows());
+	basicVars[0] = -1;
+
+	for (int i = 1; i < basicVars.size(); i++) {
+		basicVars[i] = static_cast<int>(basicVars.size()) + i;
+	}
+
+	while (true) {
 		//3
 		int pivot_column_index = 0;
 		pivot_column_index = max_index(C);
+
+		if (A[0][pivot_column_index] >= 0) {
+
+			result.state = bounded;
+			result.solution = new Vector(C.size());
+			for (int i = 0; i < C.size(); i++) {
+				result.solution->operator[](i) = 0;
+			}
+			for (int i = 1; i < basicVars.size(); i++) {
+				if (basicVars[i] <= C.size()) {
+					(*result.solution)[basicVars[i]] = b.size() - 1;
+				}
+			}
+			result.objective_function_value = b[0];
+			return result;
+		}
 
 		//4
 		Vector ratio_vector(m);
@@ -34,6 +54,8 @@ Result Simplex(Vector C, Matrix A, Vector b, double eps = 0.01, bool maximize=tr
 			ratio_vector[i] = b[i] / A[i][pivot_column_index];
 		}
 		int pivot_row_index = min_index(ratio_vector);
+
+		basicVars[pivot_row_index] = pivot_column_index;
 
 		//5
 		FracturedMatrix fractured_matrix(elimination(A, C, b, pivot_column_index, pivot_row_index));
@@ -43,8 +65,6 @@ Result Simplex(Vector C, Matrix A, Vector b, double eps = 0.01, bool maximize=tr
 		pivot_column_index = fractured_matrix.pivot_column_index;
 		pivot_row_index = fractured_matrix.pivot_row_index;
 	}
-
-	Result result;
 
 	return result;
 
