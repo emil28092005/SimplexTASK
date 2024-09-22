@@ -45,14 +45,14 @@ Result Simplex(ColumnVector C, Matrix A, ColumnVector b, double eps = 0.01, bool
 	while (b[0] < eps) {
 		//3
 		int pivot_column_index = 0;
-		pivot_column_index = Math::max_index(C);
+		pivot_column_index = max_index(C);
 
 		//4
 		ColumnVector ratio_vector(m);
 		for (int i = 0; i < m; i++) {
 			ratio_vector[i] = b[i] / A[i][pivot_column_index];
 		}
-		int pivot_row_index = Math::min_index(ratio_vector);
+		int pivot_row_index = min_index(ratio_vector);
 
 		//5
 		struct FracturedMatrix fractured_matrix();

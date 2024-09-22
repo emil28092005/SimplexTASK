@@ -102,5 +102,4 @@ FracturedMatrix elimination(Matrix A, ColumnVector C, ColumnVector b, int pivot_
     int pivot_row_index = min_index(ratio_vector);
 
     return {A, C, b, pivot_column_index, pivot_row_index};
-
-
+}
