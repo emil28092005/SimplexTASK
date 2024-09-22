@@ -23,7 +23,7 @@ struct DestroyMatrix {
 };
 
 DestroyMatrix destroyGeneralMatrix(Matrix& generalMatrix);
-FracturedMatrix elimination(Matrix A, Vector C, Vector b, int pivot_column_index, int pivot_row_index);
+void elimination(Matrix&, int pivot_row_index, int pivot_column_index);
 Matrix createGeneralMatrix(Matrix& A, Vector& C, Vector& b);
 
 

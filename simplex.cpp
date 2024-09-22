@@ -16,32 +16,35 @@ struct Result {
 };
 
 Result Simplex(Vector C, Matrix A, Vector b, double eps = 0.01, bool maximize=true) {
-
-    int m = A.getRows();
-
 	Result result{};
-	std::vector<int> basicVars(A.getColumns() - A.getRows());
+	Matrix generalMatrix = createGeneralMatrix(A, C, b);
+
+	std::vector<int> basicVars(generalMatrix.getRows());
 	basicVars[0] = -1;
 
-	for (int i = 1; i < basicVars.size(); i++) {
+	for (size_t i = 1; i < basicVars.size(); i++) {
 		basicVars[i] = static_cast<int>(basicVars.size()) + i;
 	}
 
 	while (true) {
 		//3
 		int pivot_column_index = 0;
-		pivot_column_index = max_index(C);
+		pivot_column_index = min_index(generalMatrix[0]);
 
-		if (A[0][pivot_column_index] >= 0) {
+		if (generalMatrix[0][pivot_column_index] >= 0) {
+			DestroyMatrix destroyedGeneralMatrix = destroyGeneralMatrix(generalMatrix);
+			Matrix _A = destroyedGeneralMatrix.A;
+			Vector _C = destroyedGeneralMatrix.C;
+			Vector _b = destroyedGeneralMatrix.b;
 
 			result.state = bounded;
 			result.solution = new Vector(C.size());
 			for (int i = 0; i < C.size(); i++) {
 				result.solution->operator[](i) = 0;
 			}
-			for (int i = 1; i < basicVars.size(); i++) {
+			for (size_t i = 1; i < basicVars.size(); i++) {
 				if (basicVars[i] <= C.size()) {
-					(*result.solution)[basicVars[i]] = b.size() - 1;
+					result.solution->operator[](basicVars[i]) = _b[i];
 				}
 			}
 			result.objective_function_value = b[0];
@@ -49,21 +52,22 @@ Result Simplex(Vector C, Matrix A, Vector b, double eps = 0.01, bool maximize=tr
 		}
 
 		//4
-		Vector ratio_vector(m);
-		for (int i = 0; i < m; i++) {
-			ratio_vector[i] = b[i] / A[i][pivot_column_index];
+		Vector ratio_vector(generalMatrix.getRows());
+		for (int i = 1; i < generalMatrix.getRows(); i++) {
+			if (generalMatrix[i][pivot_column_index] != 0) {
+            	ratio_vector[i] = generalMatrix[i][generalMatrix.getColumns() - 1] / generalMatrix[i][pivot_column_index];
+        	} else {
+            	ratio_vector[i] = 0;
+        	}
 		}
-		int pivot_row_index = min_index(ratio_vector);
+		ratio_vector[0] = 0;
+
+		int pivot_row_index = min_index_positive(ratio_vector);
 
 		basicVars[pivot_row_index] = pivot_column_index;
 
 		//5
-		FracturedMatrix fractured_matrix(elimination(A, C, b, pivot_column_index, pivot_row_index));
-		A = fractured_matrix.A;
-		C = fractured_matrix.C;
-		b = fractured_matrix.b;
-		pivot_column_index = fractured_matrix.pivot_column_index;
-		pivot_row_index = fractured_matrix.pivot_row_index;
+		elimination(generalMatrix, pivot_row_index, pivot_column_index);
 	}
 
 	return result;

@@ -43,8 +43,9 @@ Matrix createGeneralMatrix(Matrix& A, Vector& C, Vector& b) {
         generalMatrix[0][i] = C[i];
     }
 
-    for (int j = 0; j < A.getRows(); j++) {
-        generalMatrix[j][A.getColumns()] = b[j];
+    // For objective function (j=0) the value is set to zero automatically
+    for (int j = 1; j < A.getRows() + 1; j++) {
+        generalMatrix[j][A.getColumns()] = b[j-1];
     }
 
     for (int i = 0; i < A.getRows(); i++) {
@@ -56,8 +57,7 @@ Matrix createGeneralMatrix(Matrix& A, Vector& C, Vector& b) {
     return generalMatrix;
 }
 
-FracturedMatrix elimination(Matrix A, Vector C, Vector b, int pivot_column_index, int pivot_row_index) {
-    Matrix generalMatrix = createGeneralMatrix(A, C, b);
+void elimination(Matrix& generalMatrix, int pivot_row_index, int pivot_column_index) {
 
     int rows = generalMatrix.getRows();
     int cols = generalMatrix.getColumns();
@@ -78,25 +78,5 @@ FracturedMatrix elimination(Matrix A, Vector C, Vector b, int pivot_column_index
             generalMatrix[i][j] -= pivotColumnCoefficient * generalMatrix[pivot_row_index][j];
         }
     }
-
-    DestroyMatrix destroyedMatrix = destroyGeneralMatrix(generalMatrix);
-
-    pivot_column_index = max_index(destroyedMatrix.C);
-    
-    Vector ratio_vector(A.getRows());
-
-    for (int i = 0; i < A.getRows(); i++) {
-        if (A[i][pivot_column_index] != 0) {
-            ratio_vector[i] = b[i] / A[i][pivot_column_index];
-        }
-        
-        else {
-            ratio_vector[i] = 0;
-        }
-    }
-
-    pivot_row_index = min_index(ratio_vector);
-
-    return {A, C, b, pivot_column_index, pivot_row_index};
 }
 

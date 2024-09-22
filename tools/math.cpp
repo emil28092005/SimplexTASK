@@ -20,6 +20,26 @@ double max(Vector vector) {
     return temp;
 }
 
+int min_index_positive(Vector vector) {
+    int i = 0;
+    while (i < vector.size() && vector[i] <= 0) {
+        ++i;
+    }
+    if (i >= vector.size()) {
+        throw std::runtime_error("No positive min found");
+    }
+    int temp_index = i;
+    double temp = vector[i];
+
+    for (int j = i + 1; j < vector.size(); j++) {
+        if (vector[j] < temp && vector[j] > 0) {
+            temp_index = j;
+            temp = vector[j];
+        }
+    }
+    return temp_index;
+}
+
 int min_index(Vector vector) {
     int temp_index = 0;
     double temp = vector[0];

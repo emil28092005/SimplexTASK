@@ -7,6 +7,7 @@
 double min(Vector vector);
 double max(Vector vector);
 int min_index(Vector vector);
+int min_index_positive(Vector vector);
 int max_index(Vector vector);
 double min(std::vector<double> array);
 double max(std::vector<double> array);
