@@ -10,7 +10,7 @@ struct FracturedMatrix {
 	Vector b;
 	int pivot_column_index;
 	int pivot_row_index;
-	FracturedMatrix();
+	FracturedMatrix() = default;
 	FracturedMatrix(const FracturedMatrix& other);
 	FracturedMatrix(Matrix A, Vector C, Vector b, int pivot_column_index, int pivot_row_index);
 	FracturedMatrix& operator=(const FracturedMatrix& other);
