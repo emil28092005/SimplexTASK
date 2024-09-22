@@ -1,7 +1,7 @@
 #include "math.h"
 #include "matrix.h"
 
-double Math::min(ColumnVector columnVector) {
+double min(ColumnVector columnVector) {
     double temp = columnVector[0];
     for (int j = 0; j < columnVector.getColumns(); j++) {
         if (columnVector[j] < temp) {
@@ -11,7 +11,7 @@ double Math::min(ColumnVector columnVector) {
     return temp;
 }
 
-double Math::max(ColumnVector columnVector) {
+double max(ColumnVector columnVector) {
     double temp = columnVector[0];
     for (int j = 0; j < columnVector.getColumns(); j++) {
         if (columnVector[j] > temp) {
@@ -21,7 +21,7 @@ double Math::max(ColumnVector columnVector) {
     return temp;
 }
 
-int Math::min_index(ColumnVector columnVector) {
+int min_index(ColumnVector columnVector) {
     int temp_index = 0;
     double temp = columnVector[0];
     for (int j = 0; j < columnVector.getColumns(); j++) {
@@ -33,7 +33,7 @@ int Math::min_index(ColumnVector columnVector) {
     return temp_index;
 }
 
-int Math::max_index(ColumnVector columnVector) {
+int max_index(ColumnVector columnVector) {
     int temp_index = 0;
     double temp = columnVector[0];
     for (int j = 0; j < columnVector.getColumns(); j++) {
@@ -45,7 +45,7 @@ int Math::max_index(ColumnVector columnVector) {
     return temp_index;
 }
 
-double Math::min(std::vector<double> array) {
+double min(std::vector<double> array) {
     double temp = array[0];
     for (size_t i = 1; i < array.size(); i++) {
         if (array[i] < temp) {
@@ -55,7 +55,7 @@ double Math::min(std::vector<double> array) {
     return temp;
 }
 
-double Math::max(std::vector<double> array) {
+double max(std::vector<double> array) {
     double temp = array[0];
     for (size_t i = 1; i < array.size(); i++) {
         if (array[i] > temp) {
@@ -65,7 +65,7 @@ double Math::max(std::vector<double> array) {
     return temp;
 }
 
-double Math::min(std::vector<double> array) {
+int min_index(std::vector<double> array) {
     int temp_index = 0;
     double temp = array[0];
     for (size_t i = 1; i < array.size(); i++) {
@@ -77,7 +77,8 @@ double Math::min(std::vector<double> array) {
     return temp_index;
 }
 
-double Math::max(std::vector<double> array) {
+
+int max_index(std::vector<double> array) {
     int temp_index = 0;
     double temp = array[0];
     for (size_t i = 1; i < array.size(); i++) {

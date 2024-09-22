@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <iostream>
 #include "tools/matrix.h"
+#include "tools/math.h"
 
 enum solver_state {
 	unbounded,
@@ -10,10 +11,55 @@ enum solver_state {
 struct Result {
 	solver_state state;
 	ColumnVector *solution;
-	double objective_fucntion_value;
+	double objective_function_value;
 };
 
-Result Simplex(ColumnVector C, Matrix A, ColumnVector b, double eps = 0.01, bool maximize) {
+struct FracturedMatrix {
+	Matrix A;
+	ColumnVector C;
+	ColumnVector b;
+	int pivot_column_index;
+	int pivot_row_index;
+	FracturedMatrix();
+	FracturedMatrix(const FracturedMatrix& other) : A(other.A), C(other.C), b(other.b), pivot_column_index(other.pivot_column_index), pivot_row_index(other.pivot_row_index) {}
+	FracturedMatrix(Matrix A, ColumnVector C, ColumnVector b, int pivot_column_index, int pivot_row_index) : A(A), C(C), b(b), pivot_column_index(pivot_column_index), pivot_row_index(pivot_row_index) {}
+	FracturedMatrix& FracturedMatrix::operator=(const FracturedMatrix& other) {
+		A = other.A;
+        C = other.C;
+        b = other.b;
+        pivot_column_index = other.pivot_column_index;
+        pivot_row_index = other.pivot_row_index;
+		return *this;
+	}
+};
+
+Result Simplex(ColumnVector C, Matrix A, ColumnVector b, double eps = 0.01, bool maximize=true) {
+
+	std::cout << "C: " << C << std::endl;
+	std::cout << "A: " << A << std::endl;
+    std::cout << "b: " << b << std::endl;
+
+    int n = C.getRows();
+    int m = A.getColumns();
+
+	while (b[0] < eps) {
+		//3
+		int pivot_column_index = 0;
+		pivot_column_index = Math::max_index(C);
+
+		//4
+		ColumnVector ratio_vector(m);
+		for (int i = 0; i < m; i++) {
+			ratio_vector[i] = b[i] / A[i][pivot_column_index];
+		}
+		int pivot_row_index = Math::min_index(ratio_vector);
+
+		//5
+		struct FracturedMatrix fractured_matrix();
+		fractured_matrix = eleminate(A, C, b, pivot_column_index, pivot_row_index);
+	}
+
+	/*
 	Result result;
 	std::vector<int> basicVars(A.getColumns() - A.getRows());
 	basicVars[0] = -1;
@@ -43,7 +89,9 @@ Result Simplex(ColumnVector C, Matrix A, ColumnVector b, double eps = 0.01, bool
 			}
 		}
 		result.objective_fucntion_value = b[0];
+
 	}
+	*/
 }
 
 /*
