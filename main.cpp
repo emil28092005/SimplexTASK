@@ -15,7 +15,5 @@ int main() {
     b = {24, 6, 1, 2};
     std::cout << A << std::endl;
     std::cout << C << std::endl;
-
-    Simplex(C, A, b, 0.01, true);
     return 0;
 }
