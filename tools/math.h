@@ -4,14 +4,17 @@
 #include <vector>
 
 class ColumnVector;
-class Matrix;
 
 class Math {
 public:
-    double minVector(ColumnVector columnVector);
-    double maxVector(ColumnVector columnVector);
-    double minArray(std::vector<double> array);
-    double maxArray(std::vector<double> array);
+    double min(ColumnVector columnVector);
+    double max(ColumnVector columnVector);
+    static int min_index(ColumnVector columnVector);
+    static int max_index(ColumnVector columnVector);
+    double min(std::vector<double> array);
+    double max(std::vector<double> array);
+    int min_index(std::vector<double> array);
+    int max_index(std::vector<double> array);
 };
 
 #endif // MATH_H

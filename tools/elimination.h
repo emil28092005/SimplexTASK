@@ -5,7 +5,7 @@
 
 class Elimination {
     public:
-    Matrix elimination(Matrix A, ColumnVector C, ColumnVector b, int pivot_column_index, int pivot_row_index, double eps);
+    Matrix elimination(Matrix A, ColumnVector C, ColumnVector b, double eps);
 };
 
 
