@@ -85,17 +85,22 @@ FracturedMatrix elimination(Matrix A, ColumnVector C, ColumnVector b, int pivot_
 
     DestroyMatrix destroyedMatrix = destroyGeneralMatrix(generalMatrix);
 
-    pivot_column_index = Math::max_index(destroyedMatrix.C);
+    pivot_column_index = max_index(destroyedMatrix.C);
     
     ColumnVector ratio_vector(A.getRows());
 
     for (int i = 0; i < A.getRows(); i++) {
-      ratio_vector[i] = b[i] / A[i][pivot_column_index];
+        if (A[i][pivot_column_index] != 0) {
+            ratio_vector[i] = b[i] / A[i][pivot_column_index];
+        }
+        
+        else {
+            ratio_vector[i] = 0;
+        }
     }
 
-    int pivot_row_index = Math::min_index(ratio_vector);
+    int pivot_row_index = min_index(ratio_vector);
 
     return {A, C, b, pivot_column_index, pivot_row_index};
-}
 
 
