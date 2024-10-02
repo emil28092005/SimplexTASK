@@ -20,6 +20,6 @@ int main() {
 
         delete result.solution;
     }
-
+    std::cout << "asdasd" << std::endl;
     return 0;
 }

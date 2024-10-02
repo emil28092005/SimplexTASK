@@ -15,9 +15,24 @@ struct Result {
 	double objective_function_value;
 };
 
+void ShowMatrix(Matrix matrix) {
+    for (size_t y = 0; y < matrix.getRows(); y++) {
+    	std::string row = "";
+        for (size_t x = 0; x < matrix.getColumns(); x++) {
+			row += std::to_string(matrix[y][x]) + " ";
+        }
+        std::cout << row << std::endl;
+    }
+}
+
 Result Simplex(Vector C, Matrix A, Vector b, double eps = 0.01, bool maximize=true) {
-	Result result{};
-	Matrix generalMatrix = createGeneralMatrix(A, C, b);
+	if (maximize == false) {
+		for (int i = 0; i < C.size(); i++) {
+		    C[i] = -C[i];
+		    }
+	}
+ 	Result result{};
+  	Matrix generalMatrix = createGeneralMatrix(A, C, b);
 
 	std::vector<int> basicVars(generalMatrix.getRows());
 	basicVars[0] = -1;
