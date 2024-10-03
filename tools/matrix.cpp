@@ -9,7 +9,8 @@ void showMatrix(Matrix matrix) {
       }
     }
   }
-  std::cout << maxNumberLength << std::endl;
+  //std::cout << maxNumberLength << std::endl;
+  std::cout << std::endl;
   for (size_t y = 0; y < matrix.getRows(); y++) {
     std::string row = "";
     for (size_t x = 0; x < matrix.getColumns(); x++) {
@@ -38,6 +39,7 @@ void showMatrix(Matrix matrix) {
     }
     std::cout << row << std::endl;
   }
+  std::cout << std::endl;
 }
 
 Vector::Vector(int n) {

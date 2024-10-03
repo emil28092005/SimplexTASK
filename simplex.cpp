@@ -18,7 +18,7 @@ struct Result {
 
 
 Result Simplex(Vector C, Matrix A, Vector b, double eps = 0.01, bool maximize=true) {
-	if (maximize == false) {
+	if (maximize == true) {
 		for (int i = 0; i < C.size(); i++) {
 		    C[i] = -C[i];
 		    }
@@ -33,31 +33,62 @@ Result Simplex(Vector C, Matrix A, Vector b, double eps = 0.01, bool maximize=tr
 	for (size_t i = 1; i < basicVars.size(); i++) {
 		basicVars[i] = static_cast<int>(basicVars.size()) + i;
 	}
-
+	int iterationCount = 0;
 	while (true) {
 		//3
+		iterationCount++;
+		std::cout << "Iteration: ";
+		std::cout << iterationCount << std::endl;
 		int pivot_column_index = 0;
-		pivot_column_index = min_index(generalMatrix[0]);
+		if (maximize) {
 
-		if (generalMatrix[0][pivot_column_index] >= 0) {
-			DestroyMatrix destroyedGeneralMatrix = destroyGeneralMatrix(generalMatrix);
-			Matrix _A = destroyedGeneralMatrix.A;
-			Vector _C = destroyedGeneralMatrix.C;
-			Vector _b = destroyedGeneralMatrix.b;
+			pivot_column_index = min_index(generalMatrix[0]);
 
-			result.state = bounded;
-			result.solution = new Vector(C.size());
-			for (int i = 0; i < C.size(); i++) {
-				result.solution->operator[](i) = 0;
-			}
-			for (size_t i = 1; i < basicVars.size(); i++) {
-				if (basicVars[i] <= C.size()) {
-					result.solution->operator[](basicVars[i]) = _b[i];
+			if (generalMatrix[0][pivot_column_index] >= 0) {
+				DestroyMatrix destroyedGeneralMatrix = disassembleGeneralMatrix(generalMatrix);
+				Matrix _A = destroyedGeneralMatrix.A;
+				Vector _C = destroyedGeneralMatrix.C;
+				Vector _b = destroyedGeneralMatrix.b;
+
+				result.state = bounded;
+				result.solution = new Vector(C.size());
+				for (int i = 0; i < C.size(); i++) {
+					result.solution->operator[](i) = 0;
 				}
+				for (size_t i = 1; i < basicVars.size(); i++) {
+					if (basicVars[i] <= C.size()) {
+						result.solution->operator[](basicVars[i]) = _b[i];
+					}
+				}
+				result.objective_function_value = _C[_C.size()];
+				return result;
 			}
-			result.objective_function_value = b[0];
-			return result;
 		}
+
+		if (maximize == false) {
+			pivot_column_index = max_index(generalMatrix[0]);
+
+			if (generalMatrix[0][pivot_column_index] < 0) {
+				DestroyMatrix destroyedGeneralMatrix = disassembleGeneralMatrix(generalMatrix);
+				Matrix _A = destroyedGeneralMatrix.A;
+				Vector _C = destroyedGeneralMatrix.C;
+				Vector _b = destroyedGeneralMatrix.b;
+
+				result.state = bounded;
+				result.solution = new Vector(C.size());
+				for (int i = 0; i < C.size(); i++) {
+					result.solution->operator[](i) = 0;
+				}
+				for (size_t i = 1; i < basicVars.size(); i++) {
+					if (basicVars[i] <= C.size()) {
+						result.solution->operator[](basicVars[i]) = _b[i];
+					}
+				}
+				result.objective_function_value = _C[_C.size()];
+				return result;
+			}
+		}
+
 
 		//4
 		Vector ratio_vector(generalMatrix.getRows());
@@ -78,6 +109,48 @@ Result Simplex(Vector C, Matrix A, Vector b, double eps = 0.01, bool maximize=tr
 		elimination(generalMatrix, pivot_row_index, pivot_column_index);
 		std::cout << "After:" << std::endl;
 		showMatrix(generalMatrix);
+
+		if (maximize) {
+			bool thereIsNegative = false;
+			for (int j = 0; j < generalMatrix.getColumns()-1; ++j) {
+				if (generalMatrix[0][j] < 0) {
+					thereIsNegative = true;
+				}
+			}
+			if (thereIsNegative) {
+				for (int j = 0; j < generalMatrix.getColumns()-1; ++j) {
+					if (generalMatrix[0][j] > 0) {
+						if (generalMatrix[0][j] < (eps * (-1))) {
+							showMatrix(generalMatrix);
+							std::cout << generalMatrix[0][j] << std::endl;
+							return result;
+						}
+					}
+				}
+			}
+		}
+		if (maximize == false) {
+			bool thereIsPositive = false;
+			for (int j = 0; j < generalMatrix.getColumns()-1; ++j) {
+				if (generalMatrix[0][j] > 0) {
+					thereIsPositive = true;
+				}
+			}
+			if (thereIsPositive) {
+				for (int j = 0; j < generalMatrix.getColumns()-1; ++j) {
+					if (generalMatrix[0][j] > 0) {
+						if (generalMatrix[0][j] < eps) {
+							showMatrix(generalMatrix);
+							std::cout << generalMatrix[0][j] << std::endl;
+							return result;
+						}
+					}
+				}
+			}
+		}
+
+
+
 	}
 
 	return result;
