@@ -1,9 +1,0 @@
-{
-    "makefile.launchConfigurations": [
-        {
-            "cwd": "/home/emil/Coding/Assignments/SimplexTASK",
-            "binaryPath": "/home/emil/Coding/Assignments/SimplexTASK/simplex.out",
-            "binaryArgs": []
-        }
-    ]
-}
