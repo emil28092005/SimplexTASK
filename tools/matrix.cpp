@@ -1,5 +1,47 @@
 #include "matrix.h"
 
+void showMatrix(Matrix matrix) {
+  int maxNumberLength = 1;
+  for (size_t y = 0; y < matrix.getRows(); y++) {
+    for (size_t x = 0; x < matrix.getColumns(); x++) {
+      if (std::to_string(matrix[y][x]).length() > maxNumberLength) {
+        maxNumberLength = std::to_string(matrix[y][x]).length();
+      }
+    }
+  }
+  //std::cout << maxNumberLength << std::endl;
+  std::cout << std::endl;
+  for (size_t y = 0; y < matrix.getRows(); y++) {
+    std::string row = "";
+    for (size_t x = 0; x < matrix.getColumns(); x++) {
+      std::string strNumber = std::to_string(matrix[y][x]);
+      bool spaceRight = true;
+      while (strNumber.length() < maxNumberLength) {
+        if (spaceRight) {
+          strNumber += " ";
+        }
+        else {
+          strNumber = " " + strNumber;
+        }
+        spaceRight = !spaceRight;
+        strNumber = "" + strNumber;
+
+      }
+      if (matrix[y][x] == 0) {
+        row += "[\033[0m" + strNumber + "\033[0m] ";
+      }
+      else if(matrix[y][x] > 0) {
+        row += "[\033[32m" + strNumber + "\033[0m] ";
+      }else {
+        row += "[\033[31m" + strNumber + "\033[0m] ";
+      }
+
+    }
+    std::cout << row << std::endl;
+  }
+  std::cout << std::endl;
+}
+
 Vector::Vector(int n) {
   rows = n;
   columns = 1;

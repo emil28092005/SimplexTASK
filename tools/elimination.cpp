@@ -12,7 +12,7 @@ FracturedMatrix& FracturedMatrix::operator=(const FracturedMatrix& other) {
     return *this;
 }
 
-DestroyMatrix destroyGeneralMatrix(Matrix& generalMatrix) {
+DestroyMatrix disassembleGeneralMatrix(Matrix& generalMatrix) {
     int rows = generalMatrix.getRows();
     int cols = generalMatrix.getColumns();
 

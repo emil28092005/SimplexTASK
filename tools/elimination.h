@@ -22,7 +22,7 @@ struct DestroyMatrix {
     Vector b;
 };
 
-DestroyMatrix destroyGeneralMatrix(Matrix& generalMatrix);
+DestroyMatrix disassembleGeneralMatrix(Matrix& generalMatrix);
 void elimination(Matrix&, int pivot_row_index, int pivot_column_index);
 Matrix createGeneralMatrix(Matrix& A, Vector& C, Vector& b);
 

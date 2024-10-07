@@ -9,6 +9,8 @@
 * Vector is a class to represent
 * a column vector with n rows.
 */
+
+
 class Vector {
 protected:
 	// Number of rows in vector
@@ -94,5 +96,7 @@ public:
 	*/
 	friend std::ostream& operator<<(std::ostream& cout, Matrix& matrixObj);
 };
+
+void showMatrix(Matrix);
 
 #endif  // TOOLS_MATRIX_H
