@@ -3,25 +3,12 @@
 #include "tools/math.h"
 #include "simplex.h"
 
-void manualInput() {
-    int ZLength;
-    std::cout << "Write how many x's the objective function has:" << std::endl;
-    std::cin >> ZLength;
-    Vector Z = {};
-}
+
 void printInitialInputs(Vector C, Matrix A, Vector b) {
 
 }
 int main() {
     // TODO: Initially should be positive
-    std::string doManual = "";
-    std::cout << "Enable manual input? (y/n)" << std::endl;
-    std::cin >> doManual ;
-    if (doManual == "y" or doManual == "Y") {
-        manualInput();
-    } else if (doManual == "n"){
-
-    }
 
     Vector C = {5, 4, 0, 0, 0, 0};
 
