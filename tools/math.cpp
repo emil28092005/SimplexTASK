@@ -26,7 +26,8 @@ int min_index_positive(Vector vector) {
         ++i;
     }
     if (i >= vector.size()) {
-        throw std::runtime_error("No positive min found");
+        // No positive value found -> iterations stop
+        return -1;
     }
     int temp_index = i;
     double temp = vector[i];

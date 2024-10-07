@@ -18,14 +18,14 @@ DestroyMatrix disassembleGeneralMatrix(Matrix& generalMatrix) {
 
     Matrix A(rows - 1, cols - 1);
     Vector C(cols - 1);
-    Vector b(rows - 1);
+    Vector b(rows);
 
     for (int j = 0; j < cols - 1; ++j) {
         C[j] = generalMatrix[0][j];
     }
 
-    for (int i = 1; i < rows; ++i) {
-        b[i - 1] = generalMatrix[i - 1][cols - 1];
+    for (int i = 0; i < rows; ++i) {
+        b[i] = generalMatrix[i][cols - 1];
     }
 
     for (int i = 1; i < rows; ++i) {
@@ -38,19 +38,62 @@ DestroyMatrix disassembleGeneralMatrix(Matrix& generalMatrix) {
 }
 
 Matrix createGeneralMatrix(Matrix& A, Vector& C, Vector& b) {
-    Matrix generalMatrix(A.getRows() + 1, A.getColumns() + 1);
-    for (int i = 0; i < A.getColumns(); i++) {
-        generalMatrix[0][i] = C[i];
+
+    int m = A.getRows() + 1;
+    int n = A.getColumns() + 1;
+
+    // States if equation has a slack variable
+    std::vector<bool> has_slack(A.getColumns(), false);
+    int number_of_slack = 0;
+
+    for (int j = 0; j < A.getColumns(); ++j) {
+        int basic_var_index = 0;
+        int ones = 0;
+        int zeros = 0;
+
+        for (int i = 0; i < A.getRows(); ++i) {
+            if (A[i][j] == 1) {
+                basic_var_index = i;
+                ++ones;
+            } else if (A[i][j] == 0) {
+                ++zeros;
+            }
+        }
+
+        if (ones + zeros == A.getRows()) {
+            has_slack[basic_var_index] = true;
+            number_of_slack += 1;
+        }
     }
 
-    // For objective function (j=0) the value is set to zero automatically
-    for (int j = 1; j < A.getRows() + 1; j++) {
-        generalMatrix[j][A.getColumns()] = b[j-1];
+    n = n + A.getRows() - number_of_slack;
+    Matrix generalMatrix(m, n);
+    for (int i = 0; i < n; i++) {
+        if (i < C.size()) {
+            generalMatrix[0][i] = C[i];
+        } else {
+            generalMatrix[0][i] = 0;
+        }
     }
 
-    for (int i = 0; i < A.getRows(); i++) {
-        for (int j = 0; j < A.getColumns(); j++) {
-            generalMatrix[i + 1][j] = A[i][j];
+    // For objective function (j=0) the value is set to zero one step before
+    for (int j = 1; j < m; j++) {
+        generalMatrix[j][n-1] = b[j-1];
+    }
+
+    int k = 0;
+    for (int i = 0; i < m - 1; i++) {
+        for (int j = 0; j < n - 1; j++) {
+            if (j < A.getColumns()) {
+                generalMatrix[i + 1][j] = A[i][j];
+            } else {
+                generalMatrix[i + 1][j] = 0;
+            }
+        }
+
+        if (!has_slack[i]) {
+            generalMatrix[i + 1][A.getColumns() + k] = 1;
+            ++k;
         }
     }
 

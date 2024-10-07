@@ -6,29 +6,67 @@
 
 enum solver_state {
 	unbounded,
-	bounded
+	bounded,
+	unsolvable
 };
 
 struct Result {
 	solver_state state;
-	Vector *solution;
+	Vector solution;
 	double objective_function_value;
 };
 
+void _printInitialInputs(Vector& C, Matrix& A, Vector& b) {
 
+}
 
-Result Simplex(Vector C, Matrix A, Vector b, double eps = 0.01, bool maximize=true) {
+void _stopIterating(Matrix& generalMatrix, Vector& C, std::vector<int>& basicVars, solver_state state, Result& result) {
+	DestroyMatrix destroyedGeneralMatrix = disassembleGeneralMatrix(generalMatrix);
+	Matrix _A = destroyedGeneralMatrix.A;
+	Vector _C = destroyedGeneralMatrix.C;
+	Vector _b = destroyedGeneralMatrix.b;
+
+	result.state = state;
+	if (state == bounded) {
+		result.solution = Vector(C.size());
+		for (int i = 0; i < C.size(); i++) {
+			result.solution[i] = 0;
+		}
+		for (size_t i = 1; i < basicVars.size(); i++) {		
+			if (basicVars[i] < C.size()) {
+				result.solution[basicVars[i]] = _b[i];
+			}
+		}
+
+		result.objective_function_value = _b[0];
+	} else {
+		result.solution = Vector({0});
+		result.objective_function_value = 0;
+	}
+}
+
+/*
+	Implementation of the Simplex method.
+*/
+Result simplex(Vector& C, Matrix& A, Vector& b, double eps = 0.01, bool maximize=true) {
+
 	if (maximize == true) {
 		for (int i = 0; i < C.size(); i++) {
 		    C[i] = -C[i];
-		    }
+		}
 	}
  	Result result{};
   	Matrix generalMatrix = createGeneralMatrix(A, C, b);
-	std::cout << "Before:" << std::endl;
-	showMatrix(generalMatrix);
+	std::cout << "Before:" << std::endl << generalMatrix;
 	std::vector<int> basicVars(generalMatrix.getRows());
 	basicVars[0] = -1;
+
+	for (int i = 0; i < b.size(); ++i) {
+		if (b[i] < 0) {
+			_stopIterating(generalMatrix, C, basicVars, unsolvable, result);
+			return result;
+		}
+	}
 
 	for (size_t i = 1; i < basicVars.size(); i++) {
 		basicVars[i] = static_cast<int>(basicVars.size()) + i;
@@ -37,65 +75,30 @@ Result Simplex(Vector C, Matrix A, Vector b, double eps = 0.01, bool maximize=tr
 	while (true) {
 		//3
 		iterationCount++;
+		int pivot_column_index = 0;
+		
+		pivot_column_index = min_index(generalMatrix[0]);
+
+		if (generalMatrix[0][pivot_column_index] >= 0) {
+			_stopIterating(generalMatrix, C, basicVars, bounded, result);
+			if (!maximize) {
+				result.objective_function_value = -result.objective_function_value;
+			}
+			return result;
+		}
+
 		std::cout << "Iteration: ";
 		std::cout << iterationCount << std::endl;
-		int pivot_column_index = 0;
-		if (maximize) {
-
-			pivot_column_index = min_index(generalMatrix[0]);
-
-			if (generalMatrix[0][pivot_column_index] >= 0) {
-				DestroyMatrix destroyedGeneralMatrix = disassembleGeneralMatrix(generalMatrix);
-				Matrix _A = destroyedGeneralMatrix.A;
-				Vector _C = destroyedGeneralMatrix.C;
-				Vector _b = destroyedGeneralMatrix.b;
-
-				result.state = bounded;
-				result.solution = new Vector(C.size());
-				for (int i = 0; i < C.size(); i++) {
-					result.solution->operator[](i) = 0;
-				}
-				for (size_t i = 1; i < basicVars.size(); i++) {
-					if (basicVars[i] <= C.size()) {
-						result.solution->operator[](basicVars[i]) = _b[i];
-					}
-				}
-				result.objective_function_value = _C[_C.size()];
-				return result;
-			}
-		}
-
-		if (maximize == false) {
-			pivot_column_index = max_index(generalMatrix[0]);
-
-			if (generalMatrix[0][pivot_column_index] < 0) {
-				DestroyMatrix destroyedGeneralMatrix = disassembleGeneralMatrix(generalMatrix);
-				Matrix _A = destroyedGeneralMatrix.A;
-				Vector _C = destroyedGeneralMatrix.C;
-				Vector _b = destroyedGeneralMatrix.b;
-
-				result.state = bounded;
-				result.solution = new Vector(C.size());
-				for (int i = 0; i < C.size(); i++) {
-					result.solution->operator[](i) = 0;
-				}
-				for (size_t i = 1; i < basicVars.size(); i++) {
-					if (basicVars[i] <= C.size()) {
-						result.solution->operator[](basicVars[i]) = _b[i];
-					}
-				}
-				result.objective_function_value = _C[_C.size()];
-				return result;
-			}
-		}
-
 
 		//4
 		Vector ratio_vector(generalMatrix.getRows());
 		for (int i = 1; i < generalMatrix.getRows(); i++) {
 			if (generalMatrix[i][pivot_column_index] != 0) {
             	ratio_vector[i] = generalMatrix[i][generalMatrix.getColumns() - 1] / generalMatrix[i][pivot_column_index];
-        	} else {
+				if (std::abs(ratio_vector[i]) < eps) {
+					ratio_vector[i] = 0;
+				}
+			} else {
             	ratio_vector[i] = 0;
         	}
 		}
@@ -103,91 +106,20 @@ Result Simplex(Vector C, Matrix A, Vector b, double eps = 0.01, bool maximize=tr
 
 		int pivot_row_index = min_index_positive(ratio_vector);
 
+		// No leaving variable exists
+		if (pivot_row_index == -1) {
+			_stopIterating(generalMatrix, C, basicVars, unbounded, result);
+			return result;
+		}
+
 		basicVars[pivot_row_index] = pivot_column_index;
 
 		//5
 		elimination(generalMatrix, pivot_row_index, pivot_column_index);
-		std::cout << "After:" << std::endl;
-		showMatrix(generalMatrix);
-
-		if (maximize) {
-			bool thereIsNegative = false;
-			for (int j = 0; j < generalMatrix.getColumns()-1; ++j) {
-				if (generalMatrix[0][j] < 0) {
-					thereIsNegative = true;
-				}
-			}
-			if (thereIsNegative) {
-				for (int j = 0; j < generalMatrix.getColumns()-1; ++j) {
-					if (generalMatrix[0][j] > 0) {
-						if (generalMatrix[0][j] < (eps * (-1))) {
-							showMatrix(generalMatrix);
-							std::cout << generalMatrix[0][j] << std::endl;
-							return result;
-						}
-					}
-				}
-			}
-		}
-		if (maximize == false) {
-			bool thereIsPositive = false;
-			for (int j = 0; j < generalMatrix.getColumns()-1; ++j) {
-				if (generalMatrix[0][j] > 0) {
-					thereIsPositive = true;
-				}
-			}
-			if (thereIsPositive) {
-				for (int j = 0; j < generalMatrix.getColumns()-1; ++j) {
-					if (generalMatrix[0][j] > 0) {
-						if (generalMatrix[0][j] < eps) {
-							showMatrix(generalMatrix);
-							std::cout << generalMatrix[0][j] << std::endl;
-							return result;
-						}
-					}
-				}
-			}
-		}
-
-
-
+		std::cout << "After:" << std::endl << generalMatrix;
 	}
 
 	return result;
-
-	/*
-	Result result;
-	std::vector<int> basicVars(A.getColumns() - A.getRows());
-	basicVars[0] = -1;
-
-	for (int i = 1; i < basicVars.size(); i++) {
-		basicVars[i] = static_cast<int>(basicVars.size()) + i;
-	}
-
-	int kc = 0;
-	double temp = A[0][0];
-	for (int j = 0; j< A.getColumns(); j++) {
-		if (A[0][j] < temp) {
-			temp = A[0][j];
-			kc = j;
-		}
-	}
-
-	if (A[0][kc] >= 0) {
-		result.state = unbounded;
-		result.solution = new Vector(C.getRows());
-		for (int i = 0; i < C.getRows(); i++) {
-			result.solution->operator[](i) = 0;
-		}
-		for (int i = 1; i < basicVars.size(); i++) {
-			if (basicVars[i] <= C.getRows()) {
-				(*result.solution)[basicVars[i]] = b.getRows() - 1;
-			}
-		}
-		result.objective_fucntion_value = b[0];
-
-	}
-	*/
 }
 
 /*

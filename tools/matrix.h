@@ -97,6 +97,4 @@ public:
 	friend std::ostream& operator<<(std::ostream& cout, Matrix& matrixObj);
 };
 
-void showMatrix(Matrix);
-
 #endif  // TOOLS_MATRIX_H

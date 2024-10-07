@@ -6,15 +6,18 @@
 
 enum solver_state {
   unbounded,
-  bounded
+  bounded,
+  unsolvable
 };
 
 struct Result {
   solver_state state;
-  Vector *solution;
-  double objective_fucntion_value;
+  Vector solution;
+  double objective_function_value;
 };
 
-Result Simplex(Vector C, Matrix A, Vector b, double eps = 0.01, bool maximize = true);
+void _printInitialInputs(Vector& C, Matrix& A, Vector& b);
+void _stopIterating(Matrix& generalMatrix, std::vector<int>& basicVars, Result& result);
+Result simplex(Vector& C, Matrix& A, Vector& b, double eps = 0.01, bool maximize = true);
 
 #endif // SIMPLEX_H

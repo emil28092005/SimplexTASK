@@ -1,57 +1,243 @@
 #include <iostream>
+#include <functional>
 #include "tools/matrix.h"
 #include "tools/math.h"
 #include "simplex.h"
 
+bool check_eq(double a, double b,
+                          double relativeEpsilon = 0.0001) {
+    double diff = std::abs(a - b);
+    a = std::abs(a);
+    b = std::abs(b);
+    double largest = (b > a) ? b : a;
 
-void printInitialInputs(Vector C, Matrix A, Vector b) {
-
+    return diff <= largest * relativeEpsilon;
 }
-int main() {
-    // TODO: Initially should be positive
 
-    Vector C = {5, 4, 0, 0, 0, 0};
+int TEST_GENERAL_CASE() {
+    std::cout << "----------------------------RUNNING_TEST_GENERAL_CASE----------------------------" << std::endl;
 
+    Vector C = {5, 4};
     Matrix A = {
-             {6, 4, 1, 0, 0, 0},
-             {1, 2, 0, 1, 0, 0},
-             {-1, 1, 0, 0, 1, 0},
-             {0, 1, 0, 0, 0, 1}
-                };
-
+        {6, 4},
+        {1, 2},
+        {-1, 1},
+        {0, 1}
+    };
     Vector b = {24, 6, 1, 2};
 
-    for (int i = 0; i < b.size(); i++) {
-        if (b[i] < 0) {
-            std::cout << "Error: method is not applicable" << std::endl;
-            return 1;
+    auto result = simplex(C, A, b);
+
+    if (!(result.state == bounded)) {
+        std::string state_name;
+        switch (result.state) {
+        case unsolvable:
+            state_name = "unsolvable";
+            break;
+        case unbounded:
+            state_name = "unbounded";
+            break;
+        default:
+            state_name = "bounded";
+            break;
         }
+        std::cout << "Incorrect state type. Expected bounded. Got " << state_name << std::endl;
+        return 0;
     }
 
-    //Matrix test = {{1, -1, -2}, {1, 1, -2}, {1, -1, 2}};
+    if (!check_eq(result.objective_function_value, 21)) {
+        std::cout << "Incorrect objective function value. Expected 21. Got "
+                  << result.objective_function_value << std::endl;
+        return 0;
+    }
 
-    //showMatrix(test);
-    
+    if (!( check_eq(result.solution[0],3) && check_eq(result.solution[1], 1.5) )) {
+        std::cout << "Incorrect desire variables. Expected 3 and 1.5. Got "
+                  << result.solution;
+        return 0;
+    }
 
-    Result result = Simplex(C, A, b, 0.1, true);
+    return 1;
+}
 
+int TEST_MINIMIZE_CASE() {
+    std::cout << "----------------------------RUNNING_TEST_MINIMIZE_CASE----------------------------" << std::endl;
 
+    Vector C = {-2, 2, -6};
+    Matrix A = {
+        {2, 1, -2},
+        {1, 2, 4},
+        {1, -1, 2}
+    };
+    Vector b = {24, 23, 10};
 
-    if(result.state == bounded) {
-        if(result.solution == nullptr) {
-            std::cout << "Error: no solution value is returned" << std::endl;
-            return 1;
+    auto result = simplex(C, A, b, 0.01, false);
+
+    if (!(result.state == bounded)) {
+        std::string state_name;
+        switch (result.state) {
+        case unsolvable:
+            state_name = "unsolvable";
+            break;
+        case unbounded:
+            state_name = "unbounded";
+            break;
+        default:
+            state_name = "bounded";
+            break;
         }
-        std::cout << *result.solution << std::endl;
-        std::cout << result.objective_fucntion_value << std::endl;
+        std::cout << "Incorrect state type. Expected bounded. Got " << state_name << std::endl;
+        return 0;
+    }
 
-        delete result.solution;
+    if (!check_eq(result.objective_function_value, -30.75)) {
+        std::cout << "Incorrect objective function value. Expected -30.75. Got "
+                  << result.objective_function_value << std::endl;
+        return 0;
     }
-    else {
-        std::cout << "Error: unbounded" << std::endl;
-        return 1;
+
+    if (!( check_eq(result.solution[0], 0) && check_eq(result.solution[1], 0.75)
+        && check_eq(result.solution[2],5.375)
+    )) {
+        std::cout << "Incorrect desire variables. Expected 3 and 1.5. Got "
+                  << result.solution;
+        return 0;
     }
-    //std::cout << "asdasd" << std::endl;
+
+    return 1;
+}
+
+int TEST_WITH_SLACK_CASE() {
+    std::cout << "----------------------------RUNNING_TEST_WITH_SLACK_CASE----------------------------" << std::endl;
+
+    Vector C = {5, 4};
+    Matrix A = {
+        {6, 4, 1},
+        {1, 2, 0},
+        {-1, 1, 0},
+        {0, 1, 0}
+    };
+    Vector b = {24, 6, 1, 2};
+
+    auto result = simplex(C, A, b);
+
+    if (!(result.state == bounded)) {
+        std::string state_name;
+        switch (result.state) {
+        case unsolvable:
+            state_name = "unsolvable";
+            break;
+        case unbounded:
+            state_name = "unbounded";
+            break;
+        default:
+            state_name = "bounded";
+            break;
+        }
+        std::cout << "Incorrect state type. Expected bounded. Got " << state_name << std::endl;
+        return 0;
+    }
+
+    if (result.objective_function_value != 21) {
+        std::cout << "Incorrect objective function value. Expected 21. Got "
+                  << result.objective_function_value << std::endl;
+        return 0;
+    }
+
+    if (!((result.solution[0] == 3) || (result.solution[1] == 1.5))) {
+        std::cout << "Incorrect desire variables. Expected 3 and 1.5. Got "
+                  << result.solution[0] << result.solution[1];
+        return 0;
+    }
+
+    return 1;
+}
+
+int TEST_UNBOUNDED_CASE() {
+    std::cout << "----------------------------RUNNING_TEST_UNBOUNDED_CASE----------------------------" << std::endl;
+
+    Vector C = {2, 1};
+    Matrix A = {
+        {1, -1},
+        {2, 0}
+    };
+    Vector b = {10, 40};
+
+    auto result = simplex(C, A, b);
+
+    if (!(result.state == unbounded)) {
+        std::string state_name;
+        switch (result.state) {
+        case unsolvable:
+            state_name = "unsolvable";
+            break;
+        case unbounded:
+            state_name = "unbounded";
+            break;
+        default:
+            state_name = "bounded";
+            break;
+        }
+        std::cout << "Incorrect state type. Expected unbounded. Got " << state_name << std::endl;
+        return 0;
+    }
+
+    return 1;
+}
+
+int TEST_UNSOLVABLE_CASE() {
+    std::cout << "----------------------------RUNNING_TEST_UNSOLVABLE_CASE----------------------------" << std::endl;
+
+    Vector C = {5, 4};
+    Matrix A = {
+        {6, 4},
+        {1, 2},
+        {-1, 1},
+        {0, 1}
+    };
+    Vector b = {-24, 6, 1, 2};
+
+    auto result = simplex(C, A, b);
+
+    if (!(result.state == unsolvable)) {
+        std::string state_name;
+        switch (result.state) {
+        case unsolvable:
+            state_name = "unsolvable";
+            break;
+        case unbounded:
+            state_name = "unbounded";
+            break;
+        default:
+            state_name = "bounded";
+            break;
+        }
+        std::cout << "Incorrect state type. Expected unsolvable. Got " << state_name << std::endl;
+        return 0;
+    }
+
+    return 1;
+}
+
+int main() {
+
+    std::vector<std::function<int(void)>> tests = {
+        TEST_GENERAL_CASE,
+        TEST_MINIMIZE_CASE,
+        TEST_WITH_SLACK_CASE,
+        TEST_UNBOUNDED_CASE,
+        TEST_UNSOLVABLE_CASE
+    };
+
+    int counter = 0;
+
+    for (auto& test : tests) {
+        counter += test();
+    }
+
+    std::cout << "----------------------------RESULTS----------------------------" << std::endl;
+    std::cout << "Total number of tests: " << tests.size() << std::endl;
+    std::cout << "Total number of passed tests: " << counter << std::endl;
 
     return 0;
 }

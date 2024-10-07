@@ -4,7 +4,7 @@ TOOLS := tools
 BUILD := build
 
 build:
-	mkdir $(BUILD)
+	mkdir -p $(BUILD)
 	$(GXX) -c $(flags) $(TOOLS)/elimination.cpp -o $(BUILD)/elimination.obj
 	$(GXX) -c $(flags) $(TOOLS)/math.cpp -o $(BUILD)/math.obj
 	$(GXX) -c $(flags) $(TOOLS)/matrix.cpp -o $(BUILD)/matrix.obj
@@ -28,8 +28,11 @@ $(BUILD)/simplex.obj: simplex.cpp
 $(BUILD)/main.obj: main.cpp
 	$(GXX) -c $(flags) main.cpp -o $(BUILD)/main.obj
 
-$(BUILD)/simplex.out: $(BUILD)/elimination.obj $(BUILD)/math.obj $(BUILD)/matrix.obj $(BUILD)/simplex.obj $(BUILD)/main.obj
+simplex.out: $(BUILD)/elimination.obj $(BUILD)/math.obj $(BUILD)/matrix.obj $(BUILD)/simplex.obj $(BUILD)/main.obj
 	$(GXX) $(BUILD)/*.obj $(flags) -o simplex.out
+
+test: simplex.out
+	./simplex.out
 
 clean:
 	rm -rf $(BUILD)
