@@ -4,8 +4,36 @@
 #include "tools/math.h"
 #include "simplex.h"
 
-bool check_eq(double a, double b,
-                          double relativeEpsilon = 0.0001) {
+
+int printResult(Result result) {
+
+    if (result.state == unsolvable){
+        std::cout << "The method is not applicable!" << std::endl;
+    }else{
+        std::cout << "SOLVED!" << std::endl;
+        std::cout << "Decision variables: [";
+        for (size_t i = 0; i < result.solution.size(); i++)
+        {
+            std::cout << result.solution[i];
+            if (i != result.solution.size()-1){
+                std::cout << ", ";
+            }
+        }
+        std::cout << "]";
+        std::cout << std::endl;
+        if (result.maximize)
+        {
+            std::cout << "Maximum ";
+        }else{
+            std::cout << "Minimum ";
+        }
+        std::cout << "objective function value: " << result.objective_function_value << std::endl;
+    }
+    
+    return 0;
+}
+
+bool check_eq(double a, double b, double relativeEpsilon = 0.0001) {
     double diff = std::abs(a - b);
     a = std::abs(a);
     b = std::abs(b);
@@ -46,17 +74,19 @@ int TEST_GENERAL_CASE() {
     }
 
     if (!check_eq(result.objective_function_value, 21)) {
-        std::cout << "Incorrect objective function value. Expected 21. Got "
+        std::cout << "Incorrect objective function value. Expected 21. Got " //ЭТО УДАЛИТЬ?
                   << result.objective_function_value << std::endl;
         return 0;
     }
 
     if (!( check_eq(result.solution[0],3) && check_eq(result.solution[1], 1.5) )) {
-        std::cout << "Incorrect desire variables. Expected 3 and 1.5. Got "
+        std::cout << "Incorrect desire variables. Expected 3 and 1.5. Got " //ЭТО УДАЛИТЬ?
                   << result.solution;
         return 0;
     }
 
+    printResult(result);
+    
     return 1;
 }
 
@@ -104,6 +134,8 @@ int TEST_MINIMIZE_CASE() {
         return 0;
     }
 
+    printResult(result);
+
     return 1;
 }
 
@@ -149,6 +181,9 @@ int TEST_WITH_SLACK_CASE() {
                   << result.solution[0] << result.solution[1];
         return 0;
     }
+    
+    printResult(result);
+
 
     return 1;
 }
@@ -181,6 +216,8 @@ int TEST_UNBOUNDED_CASE() {
         std::cout << "Incorrect state type. Expected unbounded. Got " << state_name << std::endl;
         return 0;
     }
+    
+    printResult(result);
 
     return 1;
 }
@@ -215,9 +252,13 @@ int TEST_UNSOLVABLE_CASE() {
         std::cout << "Incorrect state type. Expected unsolvable. Got " << state_name << std::endl;
         return 0;
     }
+    
+    printResult(result);
 
     return 1;
 }
+
+
 
 int main() {
 

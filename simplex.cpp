@@ -14,6 +14,7 @@ struct Result {
 	solver_state state;
 	Vector solution;
 	double objective_function_value;
+	bool maximize;
 };
 
 void _printInitialInputs(Vector& C, Matrix& A, Vector& b) {
@@ -56,8 +57,10 @@ Result simplex(Vector& C, Matrix& A, Vector& b, double eps = 0.01, bool maximize
 		}
 	}
  	Result result{};
+	result.maximize = maximize;
+	
   	Matrix generalMatrix = createGeneralMatrix(A, C, b);
-	std::cout << "Before:" << std::endl << generalMatrix;
+	std::cout << generalMatrix;
 	std::vector<int> basicVars(generalMatrix.getRows());
 	basicVars[0] = -1;
 
@@ -87,8 +90,7 @@ Result simplex(Vector& C, Matrix& A, Vector& b, double eps = 0.01, bool maximize
 			return result;
 		}
 
-		std::cout << "Iteration: ";
-		std::cout << iterationCount << std::endl;
+		
 
 		//4
 		Vector ratio_vector(generalMatrix.getRows());
@@ -116,9 +118,11 @@ Result simplex(Vector& C, Matrix& A, Vector& b, double eps = 0.01, bool maximize
 
 		//5
 		elimination(generalMatrix, pivot_row_index, pivot_column_index);
-		std::cout << "After:" << std::endl << generalMatrix;
+		std::cout << "Iteration "<< iterationCount << " " << std::endl;;
+		std::cout << generalMatrix;
 	}
-
+	//result.state = solved;
+	//std::cout << result.state;
 	return result;
 }
 

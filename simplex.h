@@ -14,6 +14,7 @@ struct Result {
   solver_state state;
   Vector solution;
   double objective_function_value;
+  bool maximize;
 };
 
 void _printInitialInputs(Vector& C, Matrix& A, Vector& b);
