@@ -17,10 +17,6 @@ struct Result {
 	bool maximize;
 };
 
-void _printInitialInputs(Vector& C, Matrix& A, Vector& b) {
-
-}
-
 void _stopIterating(Matrix& generalMatrix, Vector& C, std::vector<int>& basicVars, solver_state state, Result& result) {
 	DestroyMatrix destroyedGeneralMatrix = disassembleGeneralMatrix(generalMatrix);
 	Matrix _A = destroyedGeneralMatrix.A;
@@ -121,8 +117,6 @@ Result simplex(Vector& C, Matrix& A, Vector& b, double eps = 0.01, bool maximize
 		std::cout << "Iteration "<< iterationCount << " " << std::endl;;
 		std::cout << generalMatrix;
 	}
-	//result.state = solved;
-	//std::cout << result.state;
 	return result;
 }
 

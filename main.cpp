@@ -4,12 +4,88 @@
 #include "tools/math.h"
 #include "simplex.h"
 
+void _printInitialInputs(Vector& C, Matrix& A, Vector& b, double eps, bool maximize) {
+	std::cout << "Running for the following inputs:" << std::endl << std::endl;
+    std::cout << "epsilon: " << eps << std::endl;
+    if (maximize)
+    {
+        std::cout << "Maximize" << std::endl;
+    }
+    else {
+        std::cout << "Minimize" << std::endl;
+    }
+    std::cout << "z = ";
+    bool previousIsNegative = false;
+    for (size_t i = 0; i < C.size(); i++)
+    {
+        bool isNegative = false;
+        if (C[i] != 0){
+            if (i != 0 && !previousIsNegative){
+                std::cout << " + ";
+            }
+                if (C[i] != 1) {
+                    if (C[i] < 0){
+                        isNegative = true;
+                        std::cout << "(";
+                    }
+                    std::cout << C[i] << " * ";
+                }
+                
+            std::cout << "x" << i + 1;
+            if (isNegative){
+                std::cout << ")";
+            }
+            
+        }else {
+            previousIsNegative = true;
+        }
+        
+    }
+    std::cout << std::endl << "subject to the constrains:" << std::endl;
+    std::cout<< std::endl;
+    for (size_t i = 0; i < b.size(); i++)
+    {
+        bool previousIsZero = false;
+        for (size_t j = 0; j < A.getColumns(); j++)
+        {
+            bool isNegative = false;
+            
+            if (A[i][j] != 0) {
+                if (j != 0  && !previousIsZero){
+                    std::cout << " + ";
+                    previousIsZero = false;
+                }
+                if (A[i][j] != 1) {
+                    if (A[i][j] < 0) {
+                        isNegative = true;
+                        std::cout << "(";
+                    }
+                    std::cout << A[i][j] << " * ";
+                }
+                std::cout << "x" << j + 1;
+                if (isNegative) {
+                    std::cout << ")";
+                }
+                
+            }else {
+                previousIsZero = true;
+            }
+            
+        }
+        std::cout << " <= " << b[i] << std::endl;
+        
+    }
+    
+
+
+}
+
 
 int printResult(Result result) {
 
-    if (result.state == unsolvable){
+    if (result.state == unsolvable) {
         std::cout << "The method is not applicable!" << std::endl;
-    }else{
+    }else {
         std::cout << "SOLVED!" << std::endl;
         std::cout << "Decision variables: [";
         for (size_t i = 0; i < result.solution.size(); i++)
@@ -53,6 +129,7 @@ int TEST_GENERAL_CASE() {
         {0, 1}
     };
     Vector b = {24, 6, 1, 2};
+    _printInitialInputs(C, A, b, 0.01, true);
 
     auto result = simplex(C, A, b);
 
@@ -100,6 +177,7 @@ int TEST_MINIMIZE_CASE() {
         {1, -1, 2}
     };
     Vector b = {24, 23, 10};
+    _printInitialInputs(C, A, b, 0.01, false);
 
     auto result = simplex(C, A, b, 0.01, false);
 
@@ -151,6 +229,8 @@ int TEST_WITH_SLACK_CASE() {
     };
     Vector b = {24, 6, 1, 2};
 
+    _printInitialInputs(C, A, b, 0.01, true);
+
     auto result = simplex(C, A, b);
 
     if (!(result.state == bounded)) {
@@ -197,6 +277,8 @@ int TEST_UNBOUNDED_CASE() {
         {2, 0}
     };
     Vector b = {10, 40};
+    
+    _printInitialInputs(C, A, b, 0.01, true);
 
     auto result = simplex(C, A, b);
 
@@ -233,6 +315,8 @@ int TEST_UNSOLVABLE_CASE() {
         {0, 1}
     };
     Vector b = {-24, 6, 1, 2};
+
+    _printInitialInputs(C, A, b, 0.01, true);
 
     auto result = simplex(C, A, b);
 
