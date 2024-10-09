@@ -18,58 +18,100 @@ void _printInitialInputs(Vector &C, Matrix &A, Vector &b, double eps, bool maxim
         std::cout << "Minimize" << std::endl;
     }
     std::cout << "z = ";
+    bool previousIsZero = true;
+    bool lastNonZero = false;
     for (int i = 0; i < C.size(); i++)
     {
+        
         bool isNegative = false;
-        if (i != 0)
+        
+        for (int k = i; k < C.size(); k++)
         {
-            std::cout << " + ";
-        }
-        if (C[i] != 1)
-        {
-            if (C[i] < 0)
+            if (C[k] == 0)
             {
-                isNegative = true;
-                std::cout << "(";
+                lastNonZero = true;
+            } else{
+                lastNonZero = false;
+                break;
             }
-            std::cout << C[i] << " * ";
+                
         }
 
-        std::cout << "x" << i + 1;
-        if (isNegative)
-        {
-            std::cout << ")";
+        if (!previousIsZero && !lastNonZero){
+            std::cout << " + ";
         }
+
+
+        
+        if (C[i] != 0){
+            if (C[i] != 1) {
+                if (C[i] < 0){
+                    isNegative = true;
+                    std::cout << "(";
+                }
+                std::cout << C[i] << " * ";
+            }
+            std::cout << "x" << i + 1;
+            if (isNegative){
+                std::cout << ")";
+            }
+            previousIsZero = false;
+        }else {
+            previousIsZero = true;
+        }
+
     }
     std::cout << std::endl
               << "subject to the constrains:" << std::endl;
     std::cout << std::endl;
     for (int i = 0; i < b.size(); i++)
     {
+        bool previousIsZero = true;
+        bool lastNonZero = false;
         for (int j = 0; j < A.getColumns(); j++)
         {
             bool isNegative = false;
 
-            if (j != 0)
+            for (int k = j; k < A[i].size(); k++)
             {
+                if (A[i][k] == 0)
+                {
+                    lastNonZero = true;
+                } else{
+                    lastNonZero = false;
+                    break;
+                }
+                
+            }
+
+            if (!previousIsZero && !lastNonZero){
                 std::cout << " + ";
             }
-            if (A[i][j] != 1)
-            {
-                if (A[i][j] < 0)
-                {
-                    isNegative = true;
-                    std::cout << "(";
+
+            
+            
+
+            if (A[i][j] != 0) { 
+                if (A[i][j] != 1) {
+                    if (A[i][j] < 0) {
+                        isNegative = true;
+                        std::cout << "(";
+                    }
+                    std::cout << A[i][j] << " * ";
                 }
-                std::cout << A[i][j] << " * ";
+                std::cout << "x" << j + 1;
+                if (isNegative) {
+                    std::cout << ")";
+                }
+                previousIsZero = false;
+                
+            }else {
+                previousIsZero = true;
             }
-            std::cout << "x" << j + 1;
-            if (isNegative)
-            {
-                std::cout << ")";
-            }
+
         }
         std::cout << " <= " << b[i] << std::endl;
+
     }
 }
 
