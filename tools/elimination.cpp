@@ -1,9 +1,10 @@
 #include "elimination.h"
 #include "math.h"
 
-FracturedMatrix::FracturedMatrix(const FracturedMatrix& other) : A(other.A), C(other.C), b(other.b), pivot_column_index(other.pivot_column_index), pivot_row_index(other.pivot_row_index) {}
+FracturedMatrix::FracturedMatrix(const FracturedMatrix &other) : A(other.A), C(other.C), b(other.b), pivot_column_index(other.pivot_column_index), pivot_row_index(other.pivot_row_index) {}
 FracturedMatrix::FracturedMatrix(Matrix A, Vector C, Vector b, int pivot_column_index, int pivot_row_index) : A(A), C(C), b(b), pivot_column_index(pivot_column_index), pivot_row_index(pivot_row_index) {}
-FracturedMatrix& FracturedMatrix::operator=(const FracturedMatrix& other) {
+FracturedMatrix &FracturedMatrix::operator=(const FracturedMatrix &other)
+{
     A = other.A;
     C = other.C;
     b = other.b;
@@ -12,7 +13,8 @@ FracturedMatrix& FracturedMatrix::operator=(const FracturedMatrix& other) {
     return *this;
 }
 
-DestroyMatrix disassembleGeneralMatrix(Matrix& generalMatrix) {
+DestroyMatrix disassembleGeneralMatrix(Matrix &generalMatrix)
+{
     int rows = generalMatrix.getRows();
     int cols = generalMatrix.getColumns();
 
@@ -20,16 +22,20 @@ DestroyMatrix disassembleGeneralMatrix(Matrix& generalMatrix) {
     Vector C(cols - 1);
     Vector b(rows);
 
-    for (int j = 0; j < cols - 1; ++j) {
+    for (int j = 0; j < cols - 1; ++j)
+    {
         C[j] = generalMatrix[0][j];
     }
 
-    for (int i = 0; i < rows; ++i) {
+    for (int i = 0; i < rows; ++i)
+    {
         b[i] = generalMatrix[i][cols - 1];
     }
 
-    for (int i = 1; i < rows; ++i) {
-        for (int j = 0; j < cols - 1; ++j) {
+    for (int i = 1; i < rows; ++i)
+    {
+        for (int j = 0; j < cols - 1; ++j)
+        {
             A[i - 1][j] = generalMatrix[i][j];
         }
     }
@@ -37,89 +43,76 @@ DestroyMatrix disassembleGeneralMatrix(Matrix& generalMatrix) {
     return {A, C, b};
 }
 
-Matrix createGeneralMatrix(Matrix& A, Vector& C, Vector& b) {
+Matrix createGeneralMatrix(Matrix &A, Vector &C, Vector &b)
+{
 
     int m = A.getRows() + 1;
-    int n = A.getColumns() + 1;
-
-    // States if equation has a slack variable
-    std::vector<bool> has_slack(A.getColumns(), false);
-    int number_of_slack = 0;
-
-    for (int j = 0; j < A.getColumns(); ++j) {
-        int basic_var_index = 0;
-        int ones = 0;
-        int zeros = 0;
-
-        for (int i = 0; i < A.getRows(); ++i) {
-            if (A[i][j] == 1) {
-                basic_var_index = i;
-                ++ones;
-            } else if (A[i][j] == 0) {
-                ++zeros;
-            }
-        }
-
-        if (ones + zeros == A.getRows()) {
-            has_slack[basic_var_index] = true;
-            number_of_slack += 1;
-        }
-    }
-
-    n = n + A.getRows() - number_of_slack;
+    int n = A.getColumns() + A.getRows() + 1;
     Matrix generalMatrix(m, n);
-    for (int i = 0; i < n; i++) {
-        if (i < C.size()) {
+
+    for (int i = 0; i < n; i++)
+    {
+        if (i < C.size())
+        {
             generalMatrix[0][i] = C[i];
-        } else {
+        }
+        else
+        {
             generalMatrix[0][i] = 0;
         }
     }
 
     // For objective function (j=0) the value is set to zero one step before
-    for (int j = 1; j < m; j++) {
-        generalMatrix[j][n-1] = b[j-1];
+    for (int j = 1; j < m; j++)
+    {
+        generalMatrix[j][n - 1] = b[j - 1];
     }
 
     int k = 0;
-    for (int i = 0; i < m - 1; i++) {
-        for (int j = 0; j < n - 1; j++) {
-            if (j < A.getColumns()) {
+    for (int i = 0; i < m - 1; i++)
+    {
+        for (int j = 0; j < n - 1; j++)
+        {
+            if (j < A.getColumns())
+            {
                 generalMatrix[i + 1][j] = A[i][j];
-            } else {
+            }
+            else
+            {
                 generalMatrix[i + 1][j] = 0;
             }
         }
 
-        if (!has_slack[i]) {
-            generalMatrix[i + 1][A.getColumns() + k] = 1;
-            ++k;
-        }
+        generalMatrix[i + 1][A.getColumns() + k] = 1;
+        ++k;
     }
 
     return generalMatrix;
 }
 
-void elimination(Matrix& generalMatrix, int pivot_row_index, int pivot_column_index) {
+void elimination(Matrix &generalMatrix, int pivot_row_index, int pivot_column_index)
+{
 
     int rows = generalMatrix.getRows();
     int cols = generalMatrix.getColumns();
 
     double pivotElement = generalMatrix[pivot_row_index][pivot_column_index];
 
-    for (int j = 0; j < cols; ++j) {
+    for (int j = 0; j < cols; ++j)
+    {
         generalMatrix[pivot_row_index][j] /= pivotElement;
     }
 
-    for (int i = 0; i < rows; ++i) {
-        if (i == pivot_row_index) 
+    for (int i = 0; i < rows; ++i)
+    {
+        if (i == pivot_row_index)
             continue;
 
         double pivotColumnCoefficient = generalMatrix[i][pivot_column_index];
 
-        for (int j = 0; j < cols; ++j) {
+        for (int j = 0; j < cols; ++j)
+        {
             generalMatrix[i][j] -= pivotColumnCoefficient * generalMatrix[pivot_row_index][j];
         }
     }
 }
-
