@@ -22,7 +22,6 @@ void _printInitialInputs(Vector &C, Matrix &A, Vector &b, double eps, bool maxim
     bool lastNonZero = false;
     for (int i = 0; i < C.size(); i++)
     {
-        
         bool isNegative = false;
         
         for (int k = i; k < C.size(); k++)
@@ -41,8 +40,6 @@ void _printInitialInputs(Vector &C, Matrix &A, Vector &b, double eps, bool maxim
             std::cout << " + ";
         }
 
-
-        
         if (C[i] != 0){
             if (C[i] != 1) {
                 if (C[i] < 0){
@@ -68,6 +65,7 @@ void _printInitialInputs(Vector &C, Matrix &A, Vector &b, double eps, bool maxim
     {
         bool previousIsZero = true;
         bool lastNonZero = false;
+
         for (int j = 0; j < A.getColumns(); j++)
         {
             bool isNegative = false;
@@ -88,9 +86,6 @@ void _printInitialInputs(Vector &C, Matrix &A, Vector &b, double eps, bool maxim
                 std::cout << " + ";
             }
 
-            
-            
-
             if (A[i][j] != 0) { 
                 if (A[i][j] != 1) {
                     if (A[i][j] < 0) {
@@ -108,24 +103,24 @@ void _printInitialInputs(Vector &C, Matrix &A, Vector &b, double eps, bool maxim
             }else {
                 previousIsZero = true;
             }
-
         }
         std::cout << " <= " << b[i] << std::endl;
-
     }
 }
 
 int printResult(Result result)
 {
-
     if (result.state == unsolvable)
     {
         std::cout << "The method is not applicable!" << std::endl;
+    }else if (result.state == unbounded ) {
+        std::cout << "Unbounded problem!" << std::endl;
     }
     else
     {
         std::cout << "SOLVED!" << std::endl;
         std::cout << "Decision variables: [";
+
         for (int i = 0; i < result.solution.size(); i++)
         {
             std::cout << result.solution[i];
@@ -146,7 +141,6 @@ int printResult(Result result)
         }
         std::cout << "objective function value: " << result.objective_function_value << std::endl;
     }
-
     return 0;
 }
 
@@ -156,14 +150,13 @@ bool check_eq(double a, double b, double relativeEpsilon = 0.0001)
     a = std::abs(a);
     b = std::abs(b);
     double largest = (b > a) ? b : a;
-
+    
     return diff <= largest * relativeEpsilon;
 }
 
 int TEST_GENERAL_CASE()
 {
     std::cout << "----------------------------RUNNING_TEST_GENERAL_CASE----------------------------" << std::endl;
-
     Vector C = {5, 4};
     Matrix A = {
         {6, 4},
@@ -172,7 +165,6 @@ int TEST_GENERAL_CASE()
         {0, 1}};
     Vector b = {24, 6, 1, 2};
     _printInitialInputs(C, A, b, 0.01, true);
-
     auto result = simplex(C, A, b);
 
     if (!(result.state == bounded))
@@ -209,14 +201,12 @@ int TEST_GENERAL_CASE()
     }
 
     printResult(result);
-
     return 1;
 }
 
 int TEST_MINIMIZE_CASE()
 {
     std::cout << "----------------------------RUNNING_TEST_MINIMIZE_CASE----------------------------" << std::endl;
-
     Vector C = {-2, 2, -6};
     Matrix A = {
         {2, 1, -2},
@@ -224,7 +214,6 @@ int TEST_MINIMIZE_CASE()
         {1, -1, 2}};
     Vector b = {24, 23, 10};
     _printInitialInputs(C, A, b, 0.01, false);
-
     auto result = simplex(C, A, b, 0.01, false);
 
     if (!(result.state == bounded))
@@ -399,7 +388,6 @@ int TEST_UNSOLVABLE_CASE()
 
 int main()
 {
-
     std::vector<std::function<int(void)>> tests = {
         TEST_GENERAL_CASE,
         TEST_MINIMIZE_CASE,
