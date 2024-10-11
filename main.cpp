@@ -188,14 +188,14 @@ int TEST_GENERAL_CASE()
 
     if (!check_eq(result.objective_function_value, 21))
     {
-        std::cout << "Incorrect objective function value. Expected 21. Got " // ЭТО УДАЛИТЬ?
+        std::cout << "Incorrect objective function value. Expected 21. Got "
                   << result.objective_function_value << std::endl;
         return 0;
     }
 
     if (!(check_eq(result.solution[0], 3) && check_eq(result.solution[1], 1.5)))
     {
-        std::cout << "Incorrect desire variables. Expected 3 and 1.5. Got " // ЭТО УДАЛИТЬ?
+        std::cout << "Incorrect desire variables. Expected 3 and 1.5. Got "
                   << result.solution;
         return 0;
     }
